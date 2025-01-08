@@ -1,5 +1,9 @@
 import express from "express";
-import { searchGoogle } from "./scraper.js";
+import {
+  searchGoogle,
+  processSearchResults,
+  scrapeWebsite,
+} from "./scraper.js";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +19,28 @@ app.post("/search", async (req, res) => {
     res.json(results);
   } catch (error) {
     console.error("Error during search:", error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+app.post("/scrape", async (req, res) => {
+  const { url } = req.body;
+  try {
+    const content = await scrapeWebsite(url);
+    res.send(content);
+  } catch (error) {
+    console.error("Error during scraping:", error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+app.post("/googlesearchandprocess", async (req, res) => {
+  const { query } = req.body;
+  try {
+    await processSearchResults(query);
+    res.send("Processing completed");
+  } catch (error) {
+    console.error("Error during processing:", error);
     res.status(500).send("An error occurred");
   }
 });
